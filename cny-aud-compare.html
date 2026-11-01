@@ -3,248 +3,363 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>人民币 → 澳元 换汇渠道对比</title>
 <style>
+  /* ---------- 主题变量（浅色 / 深色跟随系统） ---------- */
   :root {
-    --bg: #f5f6f8;
-    --card: #fff;
-    --text: #1c2230;
-    --muted: #7a8194;
-    --line: #e8ebf0;
-    --accent: #2563eb;
-    --accent-soft: #eef3ff;
-    --best: #0f8a4f;
-    --best-soft: #ecf8f1;
-    --amber: #a15c07;
-    --amber-soft: #fff7e8;
-    --neg: #d93636;
-    --radius: 14px;
+    color-scheme: light;
+    --page: #f4f4f1;
+    --surface: #ffffff;
+    --surface-2: #f7f7f5;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --line: #e9e8e3;
+    --line-strong: #d6d5ce;
+    --accent: #2a78d6;
+    --accent-ink: #1c5cab;
+    --accent-soft: #e8f1fc;
+    --bar: #2a78d6;
+    --meter-track: #cde2fb;
+    --good: #0ca30c;
+    --good-ink: #006300;
+    --good-soft: #eaf6ea;
+    --warn: #fab219;
+    --warn-soft: #fff4dc;
+    --crit: #d03b3b;
+    --shadow: 0 1px 2px rgba(11,11,11,.04), 0 2px 8px rgba(11,11,11,.04);
+    --radius: 16px;
   }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --surface-2: #232321;
+      --ink: #f0efec;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --line: #2c2c2a;
+      --line-strong: #383835;
+      --accent: #3987e5;
+      --accent-ink: #86b6ef;
+      --accent-soft: #16263b;
+      --bar: #3987e5;
+      --meter-track: #184f95;
+      --good-ink: #0ca30c;
+      --good-soft: #142a14;
+      --warn-soft: #33280f;
+      --shadow: none;
+    }
+  }
+
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
-          "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.55 system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 20px 16px 40px; }
   .num { font-variant-numeric: tabular-nums; }
-  .muted { color: var(--muted); }
-  .small { font-size: 12px; }
-  .amber { color: var(--amber); }
-  .pos { color: var(--best); }
-  .neg { color: var(--neg); }
+  .hint { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+  .good { color: var(--good-ink); }
+  .bad { color: var(--crit); }
 
-  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-  h1 { font-size: 20px; margin: 0; }
-  h2 { font-size: 15px; margin: 0; }
-  .disclaimer { font-size: 12px; color: var(--amber); margin: 4px 0 0; }
+  /* ---------- 布局 ---------- */
+  .app { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  .top { margin-bottom: 18px; }
+  .top h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -.2px; }
+  .disclaimer { margin: 4px 0 0; font-size: 13px; color: var(--ink-2); }
+  .disclaimer::before { content: "ⓘ "; color: var(--muted); }
+  .layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; align-items: start; }
+  .panel { position: sticky; top: 16px; }
+  main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--line); }
+  .card-pad { padding: 20px; }
+  .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; padding: 18px 20px 10px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 0; }
 
-  .card { background: var(--card); border-radius: var(--radius); padding: 18px; box-shadow: 0 1px 2px rgba(16,24,40,.05); margin-top: 16px; }
-
+  /* ---------- 控件 ---------- */
   .btn {
-    font: inherit; font-size: 13px; cursor: pointer; border-radius: 8px; padding: 6px 12px;
-    border: 1px solid var(--line); background: #fff; color: var(--text); white-space: nowrap;
+    font: inherit; font-size: 13px; cursor: pointer; border-radius: 9px; padding: 6px 12px;
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); white-space: nowrap;
   }
-  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:hover { border-color: var(--accent); color: var(--accent-ink); }
   .btn:disabled { opacity: .6; cursor: wait; }
-  .btn.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn.link { border: none; background: none; color: var(--accent); padding: 6px 4px; }
-  .btn.danger { color: var(--neg); }
+  .btn.xs { font-size: 12px; padding: 2px 10px; border-radius: 999px; }
+  .btn.link { border: none; background: none; color: var(--accent-ink); padding: 6px 0; }
+  .btn.link.danger { color: var(--crit); }
   input[type=number], input[type=text] {
-    font: inherit; color: inherit; border: 1px solid var(--line); border-radius: 7px;
-    padding: 5px 7px; background: #fff; font-variant-numeric: tabular-nums;
+    font: inherit; color: var(--ink); border: 1px solid var(--line-strong); border-radius: 8px;
+    padding: 5px 8px; background: var(--surface); font-variant-numeric: tabular-nums;
   }
-  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  input:disabled { background: #f4f5f7; color: var(--muted); }
-  input.sm { width: 76px; text-align: right; }
-  .chk { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; white-space: nowrap; }
+  input:focus-visible, .btn:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  input:disabled { background: var(--surface-2); color: var(--muted); }
+  input.sm { width: 78px; text-align: right; }
+  .chk { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; }
+  input[type=checkbox] { accent-color: var(--accent); }
 
-  /* 设置区 */
-  .amount-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .amount-box { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; }
-  .amount-box span { font-size: 20px; color: var(--muted); }
-  .amount-box input { border: none; box-shadow: none; font-size: 24px; font-weight: 700; width: 170px; padding: 6px; }
-  .quota { margin-top: 10px; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .quota input { width: 90px; text-align: right; }
-  .banner { margin-top: 10px; padding: 8px 12px; border-radius: 8px; background: var(--amber-soft); color: var(--amber); font-size: 13px; }
-  .set-row { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; }
-  .set-row .k { color: var(--muted); }
-  .set-row label { display: flex; align-items: center; gap: 6px; color: var(--muted); }
-  .set-row input[type=number] { width: 78px; text-align: right; color: var(--text); }
-  .set-row .chk { color: var(--text); }
-  .mid-status { font-size: 12px; flex-basis: 100%; }
+  /* ---------- 左侧条件面板 ---------- */
+  .sec { padding: 18px 20px; border-top: 1px solid var(--line); }
+  .sec:first-child { border-top: none; }
+  .sec-title { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; color: var(--ink-2); margin-bottom: 10px; }
+  .amount-box { display: flex; align-items: baseline; gap: 4px; border-bottom: 2px solid var(--line-strong); padding-bottom: 4px; }
+  .amount-box:focus-within { border-color: var(--accent); }
+  .amount-box span { font-size: 22px; color: var(--muted); }
+  .amount-box input { border: none; background: none; box-shadow: none !important; font-size: 32px; font-weight: 700; width: 100%; padding: 0; }
+  .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 12px; background: var(--surface-2); border-radius: 10px; padding: 3px; }
+  .seg button { font: inherit; font-size: 13px; border: none; background: none; color: var(--ink-2); padding: 5px 0; border-radius: 8px; cursor: pointer; }
+  .seg button.active { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
 
-  /* 结论 */
-  .hero { background: var(--best-soft); border: 1px solid #cdebd9; }
-  .hero.unsure { background: var(--amber-soft); border-color: #f1d9ad; }
-  .hero-label { font-size: 12px; color: var(--best); font-weight: 600; }
-  .hero.unsure .hero-label { color: var(--amber); }
-  .hero-name { font-size: 17px; font-weight: 600; margin: 2px 0 6px; }
-  .hero-aud { font-size: 30px; font-weight: 700; line-height: 1.15; }
-  .hero-aud small { font-size: 15px; font-weight: 500; color: var(--muted); }
-  .hero-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
-  .hero-notes { list-style: none; margin: 12px 0 0; padding: 10px 0 0; border-top: 1px solid rgba(0,0,0,.06); font-size: 13px; }
-  .hero-notes li { padding: 2px 0 2px 20px; position: relative; }
-  .hero-notes li::before { position: absolute; left: 0; }
-  .hero-notes .n-warn { color: var(--amber); }
-  .hero-notes .n-warn::before { content: "⚠️"; font-size: 12px; }
-  .hero-notes .n-amount::before { content: "↕"; color: var(--muted); }
-  .hero-notes .n-open::before { content: "💡"; font-size: 12px; }
+  .meter { height: 8px; border-radius: 999px; background: var(--meter-track); overflow: hidden; }
+  .meter span { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .25s, background .25s; }
+  .meter.warn span { background: var(--warn); }
+  .meter.crit span { background: var(--crit); }
+  .quota-nums { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+  .quota-used { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .quota-used input { width: 96px; text-align: right; }
+  .quota-alert { margin-top: 10px; font-size: 12px; line-height: 1.5; padding: 8px 10px; border-radius: 8px; background: var(--warn-soft); color: var(--ink); }
+  .quota-alert::before { content: "⚠ "; }
 
-  /* 渠道列表 */
-  .list-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 24px 4px 8px; flex-wrap: wrap; }
-  .list { display: flex; flex-direction: column; gap: 8px; }
-  .ch { background: var(--card); border-radius: 12px; box-shadow: 0 1px 2px rgba(16,24,40,.05); border: 1px solid transparent; }
-  .ch.best { border-color: var(--best); }
-  .ch.off .ch-row { opacity: .55; }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { position: relative; cursor: pointer; }
+  .pill input { position: absolute; opacity: 0; pointer-events: none; }
+  .pill span { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-2); }
+  .pill span::before { content: "＋"; font-size: 11px; color: var(--muted); }
+  .pill input:checked + span { background: var(--accent-soft); border-color: transparent; color: var(--accent-ink); font-weight: 500; }
+  .pill input:checked + span::before { content: "✓"; color: var(--accent-ink); }
+  .pill input:focus-visible + span { box-shadow: 0 0 0 3px var(--accent-soft); border-color: var(--accent); }
+
+  .mid-read { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; }
+  .mid-read dt { color: var(--muted); }
+  .mid-read dd { margin: 0; font-weight: 600; }
+  .mid-status.warn { color: var(--ink); background: var(--warn-soft); padding: 6px 8px; border-radius: 8px; }
+  details.mid-edit { margin-top: 10px; font-size: 12px; }
+  details.mid-edit summary { cursor: pointer; color: var(--accent-ink); }
+  .mid-grid { display: grid; gap: 6px; margin-top: 8px; }
+  .mid-grid label { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .mid-grid input { width: 96px; text-align: right; }
+  .panel-foot { padding: 4px 20px 14px; }
+
+  /* ---------- 结论 ---------- */
+  .hero { padding: 22px 24px; }
+  .eyebrow { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--good-ink); }
+  .status-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; color: var(--ink); background: var(--warn-soft); border-radius: 999px; padding: 1px 9px; }
+  .status-chip::before { content: "⚠"; }
+  .hero-name { font-size: 18px; font-weight: 600; margin: 6px 0 2px; }
+  .hero-fig { font-size: 52px; font-weight: 700; line-height: 1.1; letter-spacing: -1px; }
+  .hero-fig small { font-size: 18px; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-left: 6px; }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+  .stat { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; }
+  .stat .k { font-size: 12px; color: var(--muted); }
+  .stat .v { font-size: 16px; font-weight: 600; }
+  .stat .s { font-size: 12px; color: var(--ink-2); }
+  .insights { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
+  .insights li { display: grid; grid-template-columns: 22px 1fr; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  .insights .ico { font-size: 13px; }
+  .insights .warn-li { color: var(--ink); }
+
+  /* ---------- 排名列表 ---------- */
+  .cols { display: grid; grid-template-columns: 28px minmax(0,1fr) 150px 18px; gap: 12px; padding: 0 20px 6px; font-size: 12px; color: var(--muted); }
+  .cols span:nth-child(3) { text-align: right; }
+  .list { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+  .ch { border-bottom: 1px solid var(--line); }
+  .ch.best { background: var(--good-soft); }
   .ch-row {
     all: unset; box-sizing: border-box; cursor: pointer; width: 100%;
-    display: grid; grid-template-columns: 26px 1fr auto 16px; gap: 10px; align-items: center; padding: 12px 14px;
+    display: grid; grid-template-columns: 28px minmax(0,1fr) 150px 18px; gap: 12px; align-items: center; padding: 14px 20px;
   }
-  .ch-row:focus-visible { outline: 2px solid var(--accent); border-radius: 12px; }
-  .rank { font-weight: 700; color: var(--muted); text-align: center; }
-  .ch.best .rank { color: var(--best); }
-  .ch-main { min-width: 0; display: block; }
-  .ch-title { display: flex; align-items: center; gap: 6px; font-weight: 600; flex-wrap: wrap; }
-  .tag { flex: none; font-size: 11px; width: 18px; height: 18px; border-radius: 5px; display: inline-grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
-  .badge { font-size: 11px; padding: 0 7px; border-radius: 999px; background: var(--best); color: #fff; font-weight: 500; }
-  .flag { font-size: 11px; padding: 0 6px; border-radius: 4px; font-weight: 500; background: var(--amber-soft); color: var(--amber); }
-  .flag.grey { background: #f1f3f6; color: var(--muted); }
-  .ch-route { display: block; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .ch-num { text-align: right; display: block; }
+  .ch-row:hover { background: var(--surface-2); }
+  .ch.best .ch-row:hover { background: transparent; }
+  .ch-row:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+  .ch.off .ch-main, .ch.off .ch-num { opacity: .55; }
+  .rank { font-size: 15px; font-weight: 700; color: var(--muted); text-align: center; }
+  .ch.best .rank { color: var(--good-ink); }
+  .ch-main { display: block; min-width: 0; }
+  .ch-title { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-weight: 600; }
+  .tag { flex: none; font-size: 11px; font-weight: 600; width: 18px; height: 18px; border-radius: 5px; display: inline-grid; place-items: center; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+  .badge { font-size: 11px; font-weight: 600; padding: 0 8px; border-radius: 999px; background: var(--good); color: #fff; }
+  .badge::before { content: "✓ "; }
+  .flag { font-size: 11px; font-weight: 500; padding: 0 7px; border-radius: 999px; background: var(--warn-soft); color: var(--ink); }
+  .flag::before { content: "⚠ "; }
+  .flag.grey { background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+  .flag.grey::before { content: ""; }
+  .ch-route { display: block; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+  .costbar { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .costbar .track { flex: 1 1 auto; max-width: 340px; display: flex; align-items: center; gap: 8px; }
+  .costbar .bar { display: block; flex: none; height: 6px; background: var(--bar); border-radius: 0 3px 3px 0; min-width: 2px; transition: width .25s; }
+  .costbar .val { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+  .ch-num { display: block; text-align: right; }
   .aud { display: block; font-size: 17px; font-weight: 700; }
   .aud small { font-size: 12px; font-weight: 500; color: var(--muted); }
   .sub { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; }
-  .chev { color: var(--muted); transition: transform .2s; font-size: 18px; text-align: center; }
+  .chev { color: var(--muted); font-size: 18px; text-align: center; transition: transform .2s; }
   .ch.open .chev { transform: rotate(90deg); }
-  .divider { font-size: 12px; color: var(--muted); margin: 10px 4px 0; }
+  .divider { order: 999; padding: 10px 20px 6px; font-size: 12px; color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .list-foot { padding: 8px 20px 12px; }
 
-  .ch-panel { display: none; border-top: 1px solid var(--line); padding: 4px 14px 14px; }
+  /* 展开面板 */
+  .ch-panel { display: none; padding: 4px 20px 18px 60px; }
   .ch.open .ch-panel { display: block; }
-  .panel-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
-  .p-head { font-size: 12px; color: var(--muted); font-weight: 600; margin: 10px 0 2px; }
-  .p-step { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+  .panel-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; }
+  .p-head { font-size: 12px; font-weight: 600; color: var(--muted); margin: 8px 0 4px; }
+  .p-step { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 9px 0; border-bottom: 1px solid var(--line); }
   .p-step:last-child { border-bottom: none; }
   .p-label { font-size: 13px; }
   .p-hint { display: block; font-size: 11px; color: var(--muted); }
   .p-inputs { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--muted); flex-wrap: wrap; justify-content: flex-end; }
-  .p-mm { flex-basis: 100%; display: flex; justify-content: flex-end; gap: 5px; align-items: center; font-size: 12px; }
-  .p-mm input { width: 64px; }
-  .p-dev { flex-basis: 100%; text-align: right; font-size: 11px; }
+  .p-mm { flex-basis: 100%; display: flex; justify-content: flex-end; gap: 5px; align-items: center; font-size: 12px; color: var(--muted); }
+  .p-mm input { width: 66px; }
+  .p-dev { flex-basis: 100%; text-align: right; font-size: 11px; color: var(--muted); }
+  .breakdown { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
   .bd-line { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; font-size: 13px; }
-  .bd-line .l { color: var(--muted); }
+  .bd-line .l { color: var(--ink-2); }
   .bd-total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 8px; font-weight: 700; }
-  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; }
   .meta label { display: flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--muted); }
-  .meta label input[type=text], .meta label input[type=number] { flex: 1; min-width: 0; color: var(--text); }
-  .meta .reqs { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; color: var(--muted); grid-column: 1 / -1; }
-  .meta .reqs .chk { color: var(--text); }
-  .meta .actions { display: flex; align-items: center; gap: 12px; grid-column: 1 / -1; }
+  .meta label input[type=text], .meta label input[type=number] { flex: 1; min-width: 0; }
+  .meta .reqs, .meta .actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; color: var(--muted); }
+  .meta .reqs .chk, .meta .actions .chk { color: var(--ink); }
 
-  /* 金额区间 */
-  .range-text { font-size: 13px; margin: 8px 0 10px; }
-  .range-text div { padding: 2px 0; }
-  table.range { width: 100%; border-collapse: collapse; font-size: 13px; }
-  table.range th, table.range td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
-  table.range th { font-size: 12px; color: var(--muted); font-weight: 500; }
-  table.range th:nth-child(2), table.range td:nth-child(2) { text-align: left; white-space: normal; }
-  table.range tbody tr { cursor: pointer; }
-  table.range tbody tr:hover td { background: #fafbfc; }
-  table.range tr.current td { background: var(--accent-soft); }
+  /* ---------- 金额区间 ---------- */
+  .bands { display: flex; flex-direction: column; gap: 6px; padding: 0 20px 14px; }
+  .band { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .band .range { flex: none; min-width: 150px; color: var(--ink-2); }
+  .band .who { font-weight: 600; }
+  table.range-t { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.range-t th, table.range-t td { padding: 9px 20px; border-top: 1px solid var(--line); text-align: right; white-space: nowrap; }
+  table.range-t th { font-size: 12px; color: var(--muted); font-weight: 500; }
+  table.range-t th:nth-child(2), table.range-t td:nth-child(2) { text-align: left; white-space: normal; }
+  table.range-t tbody tr { cursor: pointer; }
+  table.range-t tbody tr:hover td { background: var(--surface-2); }
+  table.range-t tr.current td { background: var(--accent-soft); }
+  table.range-t td:first-child { font-weight: 600; }
 
-  details.notes { margin-top: 20px; font-size: 12px; color: var(--muted); }
+  details.notes { font-size: 12px; color: var(--muted); padding: 0 4px; }
   details.notes summary { cursor: pointer; }
   details.notes li { margin: 4px 0; }
 
   #toast {
     position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px);
-    background: #1c2230; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 13px;
-    opacity: 0; pointer-events: none; transition: all .25s; max-width: 90vw;
+    background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 10px; font-size: 13px;
+    opacity: 0; pointer-events: none; transition: all .25s; max-width: 90vw; z-index: 10;
   }
   #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-  @media (max-width: 640px) {
-    .wrap { padding: 14px 10px 30px; }
-    .card { padding: 14px; }
-    .panel-grid { grid-template-columns: 1fr; gap: 4px; }
-    .ch-row { grid-template-columns: 22px 1fr 14px; }
-    .ch-num { grid-column: 2 / 3; text-align: left; }
-    .chev { grid-row: 1; grid-column: 3; }
-    .amount-box input { width: 140px; }
+  /* ---------- 响应式 ---------- */
+  @media (max-width: 920px) {
+    .layout { grid-template-columns: 1fr; }
+    .panel { position: static; }
+  }
+  @media (max-width: 600px) {
+    .app { padding: 16px 10px 36px; }
+    .hero { padding: 18px; }
+    .hero-fig { font-size: 40px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stats .stat:last-child { grid-column: 1 / -1; }
+    .cols { display: none; }
+    .ch-row { grid-template-columns: 22px minmax(0,1fr) 16px; gap: 10px; padding: 14px 14px; }
+    .ch-num { grid-column: 2; grid-row: 2; text-align: left; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .chev { grid-column: 3; grid-row: 1; }
+    .ch-panel { padding: 4px 14px 16px; }
+    .panel-grid { grid-template-columns: 1fr; gap: 8px; }
+    .band .range { min-width: 0; }
+    .band { flex-wrap: wrap; gap: 2px 10px; }
+    table.range-t th, table.range-t td { padding: 9px 10px; }
     .hide-sm { display: none; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
 
-  <header>
-    <div>
-      <h1>人民币 → 澳元 换汇渠道对比</h1>
-      <p class="disclaimer">汇率和手续费请以银行/Wise 实时报价为准，本工具仅供对比参考。</p>
-    </div>
-    <button class="btn" id="btn-reset">重置默认值</button>
+  <header class="top">
+    <h1>人民币 → 澳元 换汇渠道对比</h1>
+    <p class="disclaimer">汇率和手续费请以银行/Wise 实时报价为准，本工具仅供对比参考。</p>
   </header>
 
-  <!-- ============ 设置 ============ -->
-  <section class="card">
-    <div class="amount-row">
-      <label class="amount-box"><span>¥</span><input id="amount" type="number" min="0" step="any" aria-label="人民币金额"></label>
-      <div id="quick-amounts" style="display:flex;gap:6px"></div>
-    </div>
-    <div class="quota num" id="quota-line"></div>
-    <div id="quota-banner"></div>
+  <div class="layout">
 
-    <div class="set-row">
-      <span class="k">市场中间价</span>
-      <label>1 AUD = <input id="mid-AUD" type="number" step="any" min="0"> CNY</label>
-      <label>1 HKD = <input id="mid-HKD" type="number" step="any" min="0"> CNY</label>
-      <label>1 USD = <input id="mid-USD" type="number" step="any" min="0"> CNY</label>
-      <button class="btn" id="btn-fetch">更新中间价</button>
-      <span class="mid-status" id="mid-status"></span>
-    </div>
+    <!-- ================= 左：条件 ================= -->
+    <aside class="panel card">
+      <section class="sec">
+        <div class="sec-title">换汇金额（人民币）</div>
+        <label class="amount-box"><span>¥</span><input id="amount" type="number" min="0" step="any" aria-label="人民币金额"></label>
+        <div class="seg" id="quick-amounts"></div>
+      </section>
 
-    <div class="set-row" id="accounts"></div>
-  </section>
+      <section class="sec">
+        <div class="sec-title"><span>年度购汇便利化额度</span><span class="num" id="quota-pct"></span></div>
+        <div class="meter" id="meter" role="meter" aria-valuemin="0" aria-valuemax="50000"><span id="meter-fill"></span></div>
+        <div class="quota-nums num"><span id="quota-this"></span><span id="quota-left"></span></div>
+        <label class="quota-used">今年已购汇 US$ <input id="quota-used" type="number" min="0" step="any"></label>
+        <div id="quota-alert"></div>
+      </section>
 
-  <!-- ============ 结论 ============ -->
-  <section class="card hero" id="hero"></section>
+      <section class="sec">
+        <div class="sec-title">我已有的账户</div>
+        <div class="pills" id="accounts"></div>
+        <p class="hint">取消没有的账户，相关渠道会移出排名。</p>
+      </section>
 
-  <!-- ============ 排名 ============ -->
-  <div class="list-title">
-    <h2>渠道排名</h2>
-    <span class="muted small">点击渠道可查看明细、修改汇率和费用</span>
+      <section class="sec">
+        <div class="sec-title"><span>市场中间价</span><button class="btn xs" id="btn-fetch">更新</button></div>
+        <dl class="mid-read num" id="mid-read"></dl>
+        <p class="hint mid-status" id="mid-status"></p>
+        <details class="mid-edit">
+          <summary>手动修改</summary>
+          <div class="mid-grid">
+            <label>1 AUD = <input id="mid-AUD" type="number" step="any" min="0"> CNY</label>
+            <label>1 HKD = <input id="mid-HKD" type="number" step="any" min="0"> CNY</label>
+            <label>1 USD = <input id="mid-USD" type="number" step="any" min="0"> CNY</label>
+          </div>
+        </details>
+      </section>
+
+      <div class="panel-foot"><button class="btn link" id="btn-reset">重置为默认示例</button></div>
+    </aside>
+
+    <!-- ================= 右：结论 ================= -->
+    <main>
+      <section class="card hero" id="hero"></section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>渠道排名</h2>
+          <span class="hint" style="margin:0">点击渠道查看明细、修改汇率和费用</span>
+        </div>
+        <div class="cols"><span></span><span>渠道 · 综合成本率（越短越好）</span><span>到账</span><span></span></div>
+        <div class="list" id="list"></div>
+        <div class="list-foot"><button class="btn link" id="btn-add">＋ 添加自定义渠道</button></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>金额不同，最优渠道会变吗？</h2></div>
+        <div class="bands" id="bands"></div>
+        <table class="range-t num">
+          <thead><tr><th>金额</th><th>最优渠道</th><th>到账 AUD</th><th class="hide-sm">成本率</th><th>领先第二名</th></tr></thead>
+          <tbody id="range-body"></tbody>
+        </table>
+        <p class="hint" style="padding:0 20px 16px">只比较「走得通」且已填汇率的渠道。点击某一行可切换到该金额。</p>
+      </section>
+
+      <details class="notes">
+        <summary>计算说明与数据来源</summary>
+        <ul>
+          <li>综合成本率 =（按市场中间价理论可得澳元 − 实际到账澳元）÷ 理论可得澳元，含汇差和全部手续费。</li>
+          <li>「市场中间价」指 Google/XE/Wise 显示的那种市场中间价，不是人民银行公布的中间价。「更新」先取 ECB 参考价（Frankfurter，每个工作日更新一次），失败时改用 ExchangeRate-API。</li>
+          <li>银行购汇价无法自动获取，请填当天的「现汇卖出价」（按 1 外币计；银行网页多按每 100 外币报价，需除以 100）。超过 24 小时未更新会被标为过期。</li>
+          <li>输入金额视为人民币总预算，人民币手续费从中扣除，剩余部分用于购汇。百分比手续费的「最低/最高」只作用于百分比部分，0 表示不设限。</li>
+          <li>境内个人年度购汇便利化额度为等值 5 万美元，按自然年累计。具体规则、跨境支付通限额以银行和外汇管理局为准。</li>
+          <li>到账时间为大致参考，可在每个渠道里自行修改。所有修改自动保存在本浏览器。</li>
+        </ul>
+      </details>
+    </main>
   </div>
-  <div class="list" id="list"></div>
-  <button class="btn link" id="btn-add" style="margin-top:8px">＋ 添加自定义渠道</button>
-
-  <!-- ============ 金额区间 ============ -->
-  <section class="card">
-    <h2>金额不同，最优渠道会变吗？</h2>
-    <div class="range-text" id="range-text"></div>
-    <table class="range num">
-      <thead><tr><th>金额</th><th>最优渠道</th><th>到账 AUD</th><th class="hide-sm">成本率</th><th>比第二名多</th></tr></thead>
-      <tbody id="range-body"></tbody>
-    </table>
-    <p class="muted small" style="margin:8px 0 0">只比较「走得通」且已填汇率的渠道。点击某一行可切换到该金额。</p>
-  </section>
-
-  <details class="notes">
-    <summary>计算说明与数据来源</summary>
-    <ul>
-      <li>综合成本率 =（按市场中间价理论可得澳元 − 实际到账澳元）÷ 理论可得澳元，含汇差和全部手续费。</li>
-      <li>「市场中间价」指 Google/XE/Wise 显示的那种市场中间价，不是人民银行公布的中间价。「更新中间价」先取 ECB 参考价（Frankfurter，每个工作日更新一次），失败时改用 ExchangeRate-API。</li>
-      <li>银行购汇价无法自动获取，请填当天的「现汇卖出价」（按 1 外币计；银行网页多按每 100 外币报价，需除以 100）。超过 24 小时未更新会被标为过期。</li>
-      <li>输入金额视为人民币总预算，人民币手续费从中扣除，剩余部分用于购汇。百分比手续费的「最低/最高」只作用于百分比部分，0 表示不设限。</li>
-      <li>境内个人年度购汇便利化额度为等值 5 万美元，按自然年累计。具体规则、跨境支付通限额以银行和外汇管理局为准。</li>
-      <li>到账时间为大致参考，可在每个渠道里自行修改。</li>
-      <li>所有修改自动保存在本浏览器，点「重置默认值」恢复示例数据。</li>
-    </ul>
-  </details>
 </div>
 
-<div id="toast"></div>
+<div id="toast" role="status"></div>
 
 <script>
 /* =====================================================================
@@ -266,7 +381,7 @@
  *       auto  true = 按中间价；updatedAt 为 null 表示示例数据
  * ===================================================================== */
 
-const QUICK_AMOUNTS = [10000, 50000, 100000];
+const QUICK_AMOUNTS = [10000, 50000, 100000, 200000];
 const RANGE_AMOUNTS = [10000, 50000, 100000, 200000, 300000];
 const SCAN = { from: 1000, to: 500000, step: 1000 };   // 盈亏平衡点扫描范围
 const QUOTA_USD = 50000;                                 // 个人年度购汇便利化额度
@@ -510,23 +625,38 @@ function toast(msg) {
   toast._t = setTimeout(() => el.classList.remove('show'), 3500);
 }
 
+
 /* =====================================================================
- * 五、渲染渠道列表（结构变化时重绘；排序用 CSS order，输入时不丢焦点）
+ * 五、渲染：左侧条件面板
+ * ===================================================================== */
+function renderPanel() {
+  $('amount').value = state.amount;
+  $('quota-used').value = state.quotaUsedUsd;
+  ['AUD', 'HKD', 'USD'].forEach(c => { $('mid-' + c).value = state.mid[c]; });
+  $('quick-amounts').innerHTML = QUICK_AMOUNTS
+    .map(v => `<button type="button" data-v="${v}">${v / 10000} 万</button>`).join('');
+  $('accounts').innerHTML = Object.entries(ACCOUNTS).map(([k, n]) =>
+    `<label class="pill"><input type="checkbox" data-acc="${k}" ${state.accounts[k] ? 'checked' : ''}><span>${n}</span></label>`).join('');
+}
+
+/* =====================================================================
+ * 六、渲染：渠道列表（结构变化时才重绘；排序用 CSS order，输入时不丢焦点）
  * ===================================================================== */
 function renderList() {
   $('list').innerHTML = state.channels.map((ch, ci) => {
     const curs = stepCurrencies(ch);
-    const f = (field, extra = '') => `data-ci="${ci}" data-field="${field}" ${extra}`;
+    const f = field => `data-ci="${ci}" data-field="${field}"`;
     return `
     <div class="ch ${openIds.has(ch.id) ? 'open' : ''}" id="ch-${ci}">
-      <button type="button" class="ch-row" data-toggle="${ci}">
-        <span class="rank num" id="rank-${ci}"></span>
+      <button type="button" class="ch-row" data-toggle="${ci}" aria-expanded="${openIds.has(ch.id)}">
+        <span class="rank" id="rank-${ci}"></span>
         <span class="ch-main">
           <span class="ch-title"><span class="tag">${esc(ch.tag)}</span><span id="name-${ci}"></span><span class="badge" id="badge-${ci}" hidden>最优</span><span id="flags-${ci}"></span></span>
           <span class="ch-route" id="route-${ci}"></span>
+          <span class="costbar" id="cost-${ci}"><span class="track"><span class="bar" id="bar-${ci}"></span><span class="val num" id="val-${ci}"></span></span></span>
         </span>
         <span class="ch-num num"><span class="aud" id="aud-${ci}"></span><span class="sub" id="sub-${ci}"></span></span>
-        <span class="chev">›</span>
+        <span class="chev" aria-hidden="true">›</span>
       </button>
       <div class="ch-panel">
         <div class="panel-grid">
@@ -536,7 +666,7 @@ function renderList() {
           </div>
           <div>
             <div class="p-head">成本明细</div>
-            <div id="bd-${ci}" class="num"></div>
+            <div class="breakdown num" id="bd-${ci}"></div>
           </div>
         </div>
         <div class="meta">
@@ -567,10 +697,10 @@ function renderStep(s, ci, si, cur) {
       <div class="p-step">
         ${lbl}
         <span class="p-inputs">
-          <input class="sm" type="number" step="any" min="0" value="${esc(s.pct)}" ${attr('pct')}> % +
-          <input class="sm" type="number" step="any" min="0" value="${esc(s.fixed)}" ${attr('fixed')}> ${c}
+          <input class="sm" type="number" step="any" min="0" value="${esc(s.pct)}" ${attr('pct')} aria-label="${esc(s.label)} 百分比"> % +
+          <input class="sm" type="number" step="any" min="0" value="${esc(s.fixed)}" ${attr('fixed')} aria-label="${esc(s.label)} 固定金额"> ${c}
         </span>
-        ${s.minmax ? `<span class="p-mm muted">百分比部分 最低 <input class="sm" type="number" step="any" min="0" value="${esc(s.min)}" ${attr('min')}>
+        ${s.minmax ? `<span class="p-mm">百分比部分 最低 <input class="sm" type="number" step="any" min="0" value="${esc(s.min)}" ${attr('min')}>
           最高 <input class="sm" type="number" step="any" min="0" value="${esc(s.max)}" ${attr('max')}> ${c}</span>` : ''}
       </div>`;
   }
@@ -582,45 +712,33 @@ function renderStep(s, ci, si, cur) {
     <div class="p-step">
       ${lbl}
       <span class="p-inputs">
-        1 ${one} = <input class="sm" style="width:100px" type="number" step="any" min="0" value="${esc(value)}" ${attr('rate')} ${s.auto ? 'disabled' : ''} id="rate-${ci}-${si}"> ${other}
+        1 ${one} = <input class="sm" style="width:104px" type="number" step="any" min="0" value="${esc(value)}" ${attr('rate')} ${s.auto ? 'disabled' : ''} id="rate-${ci}-${si}" aria-label="${esc(s.label)} 汇率"> ${other}
         <label class="chk"><input type="checkbox" ${s.auto ? 'checked' : ''} ${attr('auto')}>按中间价</label>
       </span>
       <span class="p-dev" id="dev-${ci}-${si}"></span>
     </div>`;
 }
 
-function renderSettings() {
-  $('amount').value = state.amount;
-  ['AUD', 'HKD', 'USD'].forEach(c => { $('mid-' + c).value = state.mid[c]; });
-  $('quick-amounts').innerHTML = QUICK_AMOUNTS.map(v => `<button class="btn chip" data-v="${v}">${v / 10000} 万</button>`).join('');
-  $('accounts').innerHTML = `<span class="k">我已有的账户</span>` + Object.entries(ACCOUNTS).map(([k, n]) =>
-    `<label class="chk"><input type="checkbox" data-acc="${k}" ${state.accounts[k] ? 'checked' : ''}>${n}</label>`).join('') +
-    `<span class="muted small" style="flex-basis:100%">没勾选的账户，相关渠道不参与排名，但会提示开通后能多拿多少。</span>`;
-  $('quota-line').innerHTML = `<span id="quota-usd"></span> · 今年已购汇 US$ <input id="quota-used" type="number" min="0" step="any" value="${esc(state.quotaUsedUsd)}"> <span id="quota-left"></span>`;
-}
-
 /* =====================================================================
- * 六、刷新所有数字（每次输入后调用）
+ * 七、刷新所有数字（每次输入后调用）
  * ===================================================================== */
 function update() {
   const amount = num(state.amount), mid = state.mid, audMid = midOf('AUD', mid);
-  document.querySelectorAll('#quick-amounts .chip').forEach(b => b.classList.toggle('active', +b.dataset.v === amount));
+  document.querySelectorAll('#quick-amounts button').forEach(b => b.classList.toggle('active', +b.dataset.v === amount));
 
   updateQuota(amount);
-  updateMidStatus();
+  updateMid();
 
   const results = state.channels.map((ch, ci) => {
     const r = computeChannel(ch, amount, mid);
     return { ch, ci, r, av: availability(ch, r, amount), st: rateStatus(ch) };
   });
   const ranked = results.filter(x => x.av.ok).sort((a, b) => b.r.finalAud - a.r.finalAud);
-  const best = ranked[0];
 
-  renderHero(results, ranked, amount, audMid);
-  renderRows(results, ranked, best);
+  renderHero(results, ranked, audMid);
+  renderRows(results, ranked);
   renderRange(amount);
 
-  $('divider').style.order = 999;
   $('divider').hidden = ranked.length === state.channels.length;
   saveState();
 }
@@ -629,33 +747,44 @@ function updateQuota(amount) {
   const usdMid = midOf('USD', state.mid);
   const usd = usdMid ? amount / usdMid : 0;
   const used = num(state.quotaUsedUsd);
-  const left = QUOTA_USD - used - usd;
-  $('quota-usd').textContent = `本次约 US$${fmt(usd, 0)}`;
-  $('quota-left').innerHTML = left >= 0 ? `· 剩余额度约 US$${fmt(left, 0)}` : '';
-  $('quota-banner').innerHTML = left < 0
-    ? `<div class="banner">本次加上今年已用，共约 US$${fmt(usd + used, 0)}，超过个人年度购汇便利化额度（等值 5 万美元），超出约 US$${fmt(-left, 0)}。超出部分通常需要凭真实性证明材料办理，请提前问清楚银行。</div>`
+  const total = used + usd;
+  const ratio = total / QUOTA_USD;
+  const meter = $('meter');
+  meter.className = 'meter' + (ratio > 1 ? ' crit' : ratio > 0.8 ? ' warn' : '');
+  meter.setAttribute('aria-valuenow', Math.round(total));
+  $('meter-fill').style.width = Math.min(100, ratio * 100) + '%';
+  $('quota-pct').textContent = `${fmt(ratio * 100, 0)}%`;
+  $('quota-this').textContent = `本次约 US$${fmt(usd, 0)}`;
+  $('quota-left').textContent = ratio <= 1 ? `剩余 US$${fmt(QUOTA_USD - total, 0)}` : `超出 US$${fmt(total - QUOTA_USD, 0)}`;
+  $('quota-alert').innerHTML = ratio > 1
+    ? `<div class="quota-alert">本次加上今年已用约 US$${fmt(total, 0)}，超过等值 5 万美元的年度便利化额度。超出部分通常需要凭真实性证明材料办理，请提前问清楚银行。</div>`
     : '';
 }
 
-function updateMidStatus() {
+function updateMid() {
+  const mid = state.mid;
+  $('mid-read').innerHTML = ['AUD', 'HKD', 'USD']
+    .map(c => `<dt>1 ${c}</dt><dd>${fmt(num(mid[c]), c === 'HKD' ? 4 : 4)} CNY</dd>`).join('');
   const m = state.midMeta || {};
-  let html;
-  if (m.source === 'example') html = `<span class="amber">示例值，尚未联网更新。点「更新中间价」获取最新数据。</span>`;
-  else if (m.source === 'manual') html = `<span class="muted">手动填写 · ${ago(m.fetchedAt)}</span>`;
-  else html = `<span class="muted">来源：${esc(m.source)} · 报价日期 ${esc(m.date)} · ${ago(m.fetchedAt)}获取</span>`;
-  $('mid-status').innerHTML = html;
+  const el = $('mid-status');
+  el.classList.toggle('warn', m.source === 'example');
+  el.textContent =
+    m.source === 'example' ? '⚠ 示例值，还没联网更新。点「更新」获取最新数据。' :
+    m.source === 'manual' ? `手动填写 · ${ago(m.fetchedAt)}` :
+    `${m.source} · 报价日 ${m.date} · ${ago(m.fetchedAt)}获取`;
 }
 
-function renderHero(results, ranked, amount, audMid) {
+function renderHero(results, ranked, audMid) {
   const hero = $('hero');
   const best = ranked[0];
   if (!best) {
-    hero.className = 'card hero unsure';
-    hero.innerHTML = `<div class="hero-label">暂无可对比的渠道</div><div class="hero-sub">请填写汇率、勾选「参与对比」，或在「我已有的账户」里勾选你有的账户。</div>`;
+    hero.innerHTML = `<div class="eyebrow" style="color:var(--ink-2)">暂无可对比的渠道</div>
+      <p class="hint">请填写汇率、勾选「参与对比」，或在左侧「我已有的账户」里选上你有的账户。</p>`;
     return;
   }
 
-  const notes = [];
+  const insights = [];
+  const li = (ico, html, cls = '') => `<li class="${cls}"><span class="ico">${ico}</span><span>${html}</span></li>`;
 
   // 数据可靠性
   const shaky = ranked.filter(x => x.st.level !== 'ok');
@@ -664,17 +793,17 @@ function renderHero(results, ranked, amount, audMid) {
     const kinds = new Set(shaky.map(x => x.st.level));
     const why = [kinds.has('example') && '示例数据', kinds.has('stale') && `超过 ${STALE_HOURS} 小时未更新`].filter(Boolean).join('或');
     const who = shaky.length === ranked.length ? '所有渠道' : shaky.map(x => x.ch.tag).join('、') + ' ';
-    notes.push(`<li class="n-warn">${who}的汇率是${why}，点开渠道填入今天的银行报价后结论才可靠。</li>`);
+    insights.push(li('⚠', `${who}的汇率是${why}。点开渠道填入今天的银行报价，结论才可靠。`, 'warn-li'));
   }
-  if (midExample) notes.push(`<li class="n-warn">市场中间价还是示例值，成本率仅供演示。</li>`);
+  if (midExample) insights.push(li('⚠', '市场中间价还是示例值，成本率仅供演示。', 'warn-li'));
   const unsure = shaky.includes(best) || midExample;
 
   // 金额影响
   const segs = findSwitches().filter(s => s.ci >= 0);
   if (segs.length > 1) {
     const sw = segs.slice(1).map((s, i) =>
-      `超过 ${yuan(s.from)} 后 ${state.channels[s.ci].tag} 比 ${state.channels[segs[i].ci].tag} 划算`).join('；');
-    notes.push(`<li class="n-amount">金额会影响结论：${sw}。</li>`);
+      `超过 <strong>${yuan(s.from)}</strong> 后 ${esc(state.channels[s.ci].tag)} 比 ${esc(state.channels[segs[i].ci].tag)} 划算`).join('；');
+    insights.push(li('↕', `金额会影响结论：${sw}。`));
   }
 
   // 开户机会
@@ -682,23 +811,29 @@ function renderHero(results, ranked, amount, audMid) {
     .sort((a, b) => b.r.finalAud - a.r.finalAud)[0];
   if (opp) {
     const gain = opp.r.finalAud - best.r.finalAud;
-    notes.push(`<li class="n-open">如果开通${opp.av.missing.map(k => ACCOUNTS[k]).join('、')}，${esc(label(opp.ch))} 可多到账 ${fmt(gain)} AUD（≈¥${fmt(gain * audMid, 0)}）。</li>`);
+    insights.push(li('💡', `如果开通${opp.av.missing.map(k => ACCOUNTS[k]).join('、')}，${esc(label(opp.ch))} 可多到账 <strong>${fmt(gain)} AUD</strong>（≈¥${fmt(gain * audMid, 0)}）。`));
   }
 
   const worst = ranked[ranked.length - 1];
   const spread = best.r.finalAud - worst.r.finalAud;
-  hero.className = 'card hero' + (unsure ? ' unsure' : '');
   hero.innerHTML = `
-    <div class="hero-label">${unsure ? '最优渠道 · 基于示例或过期数据' : '最优渠道'}</div>
+    <div class="eyebrow">最优渠道 ${unsure ? '<span class="status-chip">基于示例或过期数据</span>' : ''}</div>
     <div class="hero-name">${esc(label(best.ch))}</div>
-    <div class="hero-aud num">${fmt(best.r.finalAud)} <small>AUD</small></div>
-    <div class="hero-sub num">综合成本 ${pct(best.r.costRate)}（≈¥${fmt(best.r.totalCny, 0)}）${best.ch.eta ? ` · ${esc(best.ch.eta)}` : ''}${
-      ranked.length > 1 ? ` · 比最差渠道多到账 ${fmt(spread)} AUD（≈¥${fmt(spread * audMid, 0)}）` : ''}</div>
-    ${notes.length ? `<ul class="hero-notes">${notes.join('')}</ul>` : ''}`;
+    <div class="hero-fig">${fmt(best.r.finalAud)}<small>AUD</small></div>
+    <div class="stats">
+      <div class="stat"><div class="k">综合成本</div><div class="v num">${pct(best.r.costRate)}</div><div class="s num">≈¥${fmt(best.r.totalCny, 0)}</div></div>
+      <div class="stat"><div class="k">到账时间</div><div class="v">${esc(best.ch.eta || '—')}</div><div class="s">参考值</div></div>
+      <div class="stat"><div class="k">比最差渠道多</div><div class="v num">${ranked.length > 1 ? `+${fmt(spread)} AUD` : '—'}</div><div class="s num">${ranked.length > 1 ? `≈¥${fmt(spread * audMid, 0)} · vs ${esc(worst.ch.tag)}` : '只有一个渠道'}</div></div>
+    </div>
+    ${insights.length ? `<ul class="insights">${insights.join('')}</ul>` : ''}`;
 }
 
-function renderRows(results, ranked, best) {
+function renderRows(results, ranked) {
   const mid = state.mid;
+  const best = ranked[0];
+  const shown = results.filter(x => x.av.ok || x.av.soft);
+  const maxCost = Math.max(0.0001, ...shown.map(x => x.r.costRate));
+
   results.forEach(({ ch, ci, r, av, st }) => {
     const el = $('ch-' + ci);
     if (!el) return;
@@ -709,20 +844,29 @@ function renderRows(results, ranked, best) {
     $('rank-' + ci).textContent = rank >= 0 ? rank + 1 : '–';
     $('badge-' + ci).hidden = rank !== 0;
     $('name-' + ci).textContent = ch.name;
-    $('route-' + ci).textContent = (ch.eta ? '⏱ ' + ch.eta + ' · ' : '') + ch.route;
+    $('route-' + ci).textContent = (ch.eta ? ch.eta + ' · ' : '') + ch.route;
 
     const flags = [];
     if (av.soft) flags.push(`<span class="flag grey">${esc(av.reason)}</span>`);
     if (ch.enabled && st.level !== 'ok') flags.push(`<span class="flag">${esc(st.text)}</span>`);
     $('flags-' + ci).innerHTML = flags.join(' ');
 
+    // 成本条：共用 0 基线，长度 = 成本率 / 当前最大成本率
+    const hasNum = av.ok || av.soft;
+    $('cost-' + ci).hidden = !hasNum;
+    if (hasNum) {
+      $('bar-' + ci).style.width = `calc((100% - 56px) * ${Math.max(0, r.costRate / maxCost).toFixed(4)})`;
+      $('val-' + ci).textContent = pct(r.costRate);
+      $('cost-' + ci).title = `综合成本 ${pct(r.costRate, 3)}：汇差 ≈¥${fmt(r.spreadCny, 0)} + 手续费 ≈¥${fmt(r.feeCny, 0)}`;
+    }
+
     if (av.ok) {
       $('aud-' + ci).innerHTML = `${fmt(r.finalAud)} <small>AUD</small>`;
-      $('sub-' + ci).innerHTML = `成本 ${pct(r.costRate)}` + (rank > 0 ? ` · <span class="neg">少 ${fmt(best.r.finalAud - r.finalAud)} AUD</span>` : '');
+      $('sub-' + ci).innerHTML = rank === 0 ? '最多' : `<span class="bad">−${fmt(best.r.finalAud - r.finalAud)} AUD</span>`;
     } else if (av.soft) {
       $('aud-' + ci).innerHTML = `${fmt(r.finalAud)} <small>AUD</small>`;
       const d = best ? r.finalAud - best.r.finalAud : 0;
-      $('sub-' + ci).innerHTML = `成本 ${pct(r.costRate)}` + (best ? ` · <span class="${d > 0 ? 'pos' : 'neg'}">${d > 0 ? '比最优多' : '比最优少'} ${fmt(Math.abs(d))} AUD</span>` : '');
+      $('sub-' + ci).innerHTML = best ? `<span class="${d > 0 ? 'good' : 'bad'}">${d > 0 ? '+' : '−'}${fmt(Math.abs(d))} AUD</span> vs 最优` : '';
     } else {
       $('aud-' + ci).innerHTML = '';
       $('sub-' + ci).textContent = av.reason;
@@ -737,22 +881,22 @@ function renderRows(results, ranked, best) {
       if (s.auto) { const ri = $(`rate-${ci}-${si}`); if (ri) ri.value = m.toFixed(digits); }
       const used = s.auto ? m : num(s.rate);
       const dev = m && used ? (s.quote === 'perTo' ? used / m - 1 : 1 - used / m) : 0;
-      const parts = [`<span class="muted">中间价 ${m.toFixed(digits)}</span>`];
+      const parts = [`中间价 ${m.toFixed(digits)}`];
       if (!s.auto && used) {
-        parts.push(`<span class="${dev > 0.00005 ? 'neg' : ''}">比中间价差 ${pct(dev, 3)}</span>`);
-        if (Math.abs(dev) > 0.2) parts.push(`<span class="amber">偏离过大，是否按每 100 外币填了？</span>`);
+        parts.push(`<span class="${dev > 0.00005 ? 'bad' : ''}">比中间价差 ${pct(dev, 3)}</span>`);
+        if (Math.abs(dev) > 0.2) parts.push(`<span class="bad">偏离过大，是否按每 100 外币填了？</span>`);
         parts.push(s.updatedAt
-          ? `<span class="${Date.now() - s.updatedAt > STALE_HOURS * 3600e3 ? 'amber' : 'muted'}">${ago(s.updatedAt)}填写</span>`
-          : `<span class="amber">示例数据</span>`);
+          ? (Date.now() - s.updatedAt > STALE_HOURS * 3600e3 ? `⚠ ${ago(s.updatedAt)}填写，已过期` : `${ago(s.updatedAt)}填写`)
+          : '⚠ 示例数据');
       }
       const d = $(`dev-${ci}-${si}`);
-      if (d) d.innerHTML = parts.join('<span class="muted"> · </span>');
+      if (d) d.innerHTML = parts.join(' · ');
     });
 
-    const shown = r.lines.filter(l => Math.abs(l.cny) >= 0.005);
+    const lines = r.lines.filter(l => Math.abs(l.cny) >= 0.005);
     $('bd-' + ci).innerHTML =
-      (shown.length ? shown.map(l => l.kind === 'fee'
-        ? `<div class="bd-line"><span class="l">${esc(l.label)}</span><span>${fmt(l.value)} ${l.cur}${l.cur !== 'CNY' ? ` <span class="muted">≈¥${fmt(l.cny)}</span>` : ''}</span></div>`
+      (lines.length ? lines.map(l => l.kind === 'fee'
+        ? `<div class="bd-line"><span class="l">${esc(l.label)}</span><span>${fmt(l.value)} ${l.cur}${l.cur !== 'CNY' ? ` <span class="hint" style="margin:0">≈¥${fmt(l.cny)}</span>` : ''}</span></div>`
         : `<div class="bd-line"><span class="l">${esc(l.label)} · 汇差</span><span>≈¥${fmt(l.cny)}</span></div>`
       ).join('') : `<div class="bd-line"><span class="l">无费用</span><span></span></div>`) +
       `<div class="bd-line"><span class="l">综合成本</span><span>≈¥${fmt(r.totalCny)}（${pct(r.costRate, 3)}）</span></div>` +
@@ -762,13 +906,10 @@ function renderRows(results, ranked, best) {
 
 function renderRange(amount) {
   const segs = findSwitches();
-  const segText = segs.map(s => {
-    const range = s.to == null ? `${yuan(s.from)} 以上` : `${yuan(s.from)} – ${yuan(s.to)}`;
-    const who = s.ci >= 0 ? `<strong>${esc(label(state.channels[s.ci]))}</strong> 最优` : '<span class="muted">没有可用渠道</span>';
-    return `<div>${range}：${who}</div>`;
-  }).join('');
-  $('range-text').innerHTML = segs.length > 1 ? segText
-    : `<div>在 ${yuan(SCAN.from)} – ${yuan(SCAN.to)} 范围内，最优渠道都是 ${segs[0].ci >= 0 ? `<strong>${esc(label(state.channels[segs[0].ci]))}</strong>` : '（无）'}，金额不影响结论。</div>`;
+  const name = ci => (ci >= 0 ? esc(label(state.channels[ci])) : '<span class="hint" style="margin:0">没有可用渠道</span>');
+  $('bands').innerHTML = segs.length > 1
+    ? segs.map(s => `<div class="band"><span class="range num">${s.to == null ? `${yuan(s.from)} 以上` : `${yuan(s.from)} – ${yuan(s.to)}`}</span><span class="who">${name(s.ci)}</span></div>`).join('')
+    : `<div class="band"><span>在 ${yuan(SCAN.from)} – ${yuan(SCAN.to)} 范围内，最优都是 <strong>${name(segs[0].ci)}</strong>，金额不影响结论。</span></div>`;
 
   const amounts = [...new Set([...RANGE_AMOUNTS, amount].filter(a => a > 0))].sort((a, b) => a - b);
   $('range-body').innerHTML = amounts.map(a => {
@@ -776,16 +917,16 @@ function renderRange(amount) {
     const b = r[0], second = r[1];
     return `<tr data-amount="${a}" class="${a === amount ? 'current' : ''}">
       <td>¥${fmt(a, 0)}</td>
-      <td>${b ? `${esc(b.ch.tag)}<span class="hide-sm">. ${esc(b.ch.name)}</span>` : '<span class="muted">无</span>'}</td>
-      <td>${b ? fmt(b.r.finalAud) : '–'}</td>
-      <td class="hide-sm">${b ? pct(b.r.costRate) : '–'}</td>
-      <td>${b && second ? `${fmt(b.r.finalAud - second.r.finalAud)} AUD <span class="muted small">vs ${esc(second.ch.tag)}</span>` : '–'}</td>
+      <td>${b ? `${esc(b.ch.tag)}<span class="hide-sm">. ${esc(b.ch.name)}</span>` : '—'}</td>
+      <td>${b ? fmt(b.r.finalAud) : '—'}</td>
+      <td class="hide-sm">${b ? pct(b.r.costRate) : '—'}</td>
+      <td>${b && second ? `+${fmt(b.r.finalAud - second.r.finalAud)} <span class="hint" style="margin:0">vs ${esc(second.ch.tag)}</span>` : '—'}</td>
     </tr>`;
   }).join('');
 }
 
 /* =====================================================================
- * 七、联网更新市场中间价（银行购汇价无公开接口，仍需手动填写）
+ * 八、联网更新市场中间价（银行购汇价无公开接口，仍需手动填写）
  * ===================================================================== */
 async function fetchMidRates({ silent = false } = {}) {
   const btn = $('btn-fetch');
@@ -813,51 +954,45 @@ async function fetchMidRates({ silent = false } = {}) {
         return true;
       } catch (e) { /* 换下一个数据源 */ }
     }
-    if (!silent) toast('中间价获取失败（可能是网络或浏览器限制），请手动填写。');
+    if (!silent) toast('中间价获取失败（可能是网络或浏览器限制），请在「手动修改」里填写。');
     return false;
   } finally {
-    btn.disabled = false; btn.textContent = '更新中间价';
+    btn.disabled = false; btn.textContent = '更新';
   }
 }
 
 /* =====================================================================
- * 八、事件
+ * 九、事件
  * ===================================================================== */
 function refreshAll() {
-  renderSettings();
+  renderPanel();
   renderList();
   update();
 }
 
 const readNumber = input => (input.value === '' ? '' : Number(input.value));
+const setAmount = v => { state.amount = v; $('amount').value = v; update(); };
 
 $('amount').addEventListener('input', e => { state.amount = readNumber(e.target); update(); });
+$('quota-used').addEventListener('input', e => { state.quotaUsedUsd = readNumber(e.target); update(); });
 ['AUD', 'HKD', 'USD'].forEach(c => $('mid-' + c).addEventListener('input', e => {
   state.mid[c] = readNumber(e.target);
   state.midMeta = { source: 'manual', date: null, fetchedAt: Date.now() };
   update();
 }));
-$('quota-line').addEventListener('input', e => {
-  if (e.target.id === 'quota-used') { state.quotaUsedUsd = readNumber(e.target); update(); }
-});
 $('accounts').addEventListener('change', e => {
   const k = e.target.dataset.acc;
   if (k) { state.accounts[k] = e.target.checked; update(); }
 });
 $('quick-amounts').addEventListener('click', e => {
   const b = e.target.closest('[data-v]');
-  if (!b) return;
-  state.amount = +b.dataset.v;
-  $('amount').value = state.amount;
-  update();
+  if (b) setAmount(+b.dataset.v);
 });
 $('range-body').addEventListener('click', e => {
   const tr = e.target.closest('[data-amount]');
   if (!tr) return;
-  state.amount = +tr.dataset.amount;
-  $('amount').value = state.amount;
-  update();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setAmount(+tr.dataset.amount);
+  if (window.innerWidth <= 920) window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 function onListInput(e) {
@@ -901,6 +1036,7 @@ $('list').addEventListener('click', e => {
     const ci = +toggle.dataset.toggle, id = state.channels[ci].id;
     openIds.has(id) ? openIds.delete(id) : openIds.add(id);
     $('ch-' + ci).classList.toggle('open', openIds.has(id));
+    toggle.setAttribute('aria-expanded', openIds.has(id));
     return;
   }
   const del = e.target.closest('[data-delete]');
