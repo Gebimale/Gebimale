@@ -508,7 +508,7 @@ function buildDefaults() {
           { type: 'convert', label: '人民币换港币', to: 'HKD', quote: 'perTo', rate: 0.8520, auto: false, updatedAt: null, hint: '免手续费不代表没有汇差' },
           { type: 'fee', label: '汇丰香港 → Wise（FPS）', pct: 0, fixed: 0 },
           { type: 'fee', label: 'Wise 换汇手续费', pct: 0.5, fixed: 0 },
-          { type: 'convert', label: 'Wise 港币换澳元', to: 'AUD', quote: 'perFrom', rate: 0.181624, auto: true, updatedAt: null },
+          { type: 'convert', label: 'Wise 港币换澳元', to: 'AUD', quote: 'perFrom', rate: 0.181624, auto: false, updatedAt: null, hint: '打开 Wise 换汇页面，照抄实时汇率（如 1 HKD = 0.18 AUD）' },
           { type: 'fee', label: 'Wise → 澳洲银行', pct: 0, fixed: 0 },
         ],
       },
@@ -594,21 +594,27 @@ function computeChannel(ch, amount, mid) {
 /** 渠道能否参与排名。soft = 能算出结果，只是你暂时走不通（缺账户/超上限） */
 function availability(ch, r, amount) {
   if (!ch.enabled) return { ok: false, reason: '未参与对比' };
-  if (!(r.finalAud > 0)) return { ok: false, reason: '请填写汇率' };
+  if (!(amount > 0)) return { ok: false, reason: '请输入金额' };
+  if (ch.steps.some(s => s.type === 'convert' && !s.auto && !(num(s.rate) > 0))) return { ok: false, reason: '请填写汇率' };
+  if (!(r.finalAud > 0)) return { ok: false, reason: '金额太小，不够付手续费' };
   const missing = (ch.requires || []).filter(k => !state.accounts[k]);
   if (missing.length) return { ok: false, soft: true, missing, reason: '需开通' + missing.map(k => ACCOUNTS[k]).join('、') };
   if (num(ch.limit) > 0 && amount > num(ch.limit)) return { ok: false, soft: true, reason: `超过单笔上限 ¥${fmt(num(ch.limit), 0)}` };
   return { ok: true };
 }
 
-/** 汇率新鲜度：只看手动填写的汇率（按中间价的步骤跟随中间价） */
+/** 汇率可靠性：示例 > 过期 > 按中间价估算 > 正常
+ *  「按中间价」用的是 ECB 等参考价（每个工作日更新一次），不是实时价，
+ *  和你照抄的银行实时价放在一起比，可能让排名失真，所以单独提醒。 */
 function rateStatus(ch) {
-  const manual = ch.steps.filter(s => s.type === 'convert' && !s.auto);
-  if (!manual.length) return { level: 'ok' };
-  if (manual.some(s => !s.updatedAt)) return { level: 'example', text: '示例汇率' };
-  const oldest = Math.min(...manual.map(s => s.updatedAt));
-  if (Date.now() - oldest > STALE_HOURS * 3600e3) return { level: 'stale', text: `汇率${ago(oldest)}填写` };
-  return { level: 'ok', text: `汇率${ago(oldest)}填写` };
+  const converts = ch.steps.filter(s => s.type === 'convert');
+  const manual = converts.filter(s => !s.auto);
+  const estimate = converts.some(s => s.auto);          // 独立标记，不会被「示例」盖住
+  if (manual.some(s => !s.updatedAt)) return { level: 'example', text: '示例汇率', estimate };
+  const oldest = manual.length ? Math.min(...manual.map(s => s.updatedAt)) : null;
+  if (oldest && Date.now() - oldest > STALE_HOURS * 3600e3) return { level: 'stale', text: `汇率${ago(oldest)}填写`, estimate };
+  if (estimate) return { level: 'estimate', text: '按中间价估算', estimate };
+  return { level: 'ok', text: oldest ? `汇率${ago(oldest)}填写` : '', estimate };
 }
 
 /** 某个金额下的排名（只含能走通的渠道） */
@@ -841,8 +847,18 @@ function renderHero(results, ranked, audMid) {
   const hero = $('hero');
   const best = ranked[0];
   if (!best) {
-    hero.innerHTML = `<div class="eyebrow" style="color:var(--ink-2)">暂无可对比的渠道</div>
-      <p class="hint">请填写汇率、勾选「参与对比」，或在左侧「我已有的账户」里选上你有的账户。</p>`;
+    const amount = num(state.amount);
+    const reasons = new Set(results.filter(x => x.ch.enabled).map(x => x.av.reason));
+    let title = '暂无可对比的渠道';
+    let tip = '请填写汇率、勾选「参与对比」，或在左侧「我已有的账户」里选上你有的账户。';
+    if (!(amount > 0)) {
+      title = '请输入换汇金额';
+      tip = '在左侧填写要换的人民币金额，或点「1 万」「5 万」等快捷按钮。';
+    } else if (reasons.size === 1 && reasons.has('金额太小，不够付手续费')) {
+      title = '金额太小';
+      tip = `¥${fmt(amount, 0)} 不够付各渠道的固定手续费，请加大金额。`;
+    }
+    hero.innerHTML = `<div class="eyebrow" style="color:var(--ink-2)">${title}</div><p class="hint">${tip}</p>`;
     return;
   }
 
@@ -850,7 +866,8 @@ function renderHero(results, ranked, audMid) {
   const li = (ico, html, cls = '') => `<li class="${cls}"><span class="ico">${ico}</span><span>${html}</span></li>`;
 
   // 数据可靠性
-  const shaky = ranked.filter(x => x.st.level !== 'ok');
+  const shaky = ranked.filter(x => x.st.level === 'example' || x.st.level === 'stale');
+  const estimated = ranked.filter(x => x.st.estimate);
   const midExample = (state.midMeta || {}).source === 'example';
   if (shaky.length) {
     const kinds = new Set(shaky.map(x => x.st.level));
@@ -858,8 +875,14 @@ function renderHero(results, ranked, audMid) {
     const who = shaky.length === ranked.length ? '所有渠道' : shaky.map(x => x.ch.tag).join('、') + ' ';
     insights.push(li('⚠', `${who}的汇率是${why}。点开渠道填入今天的银行报价，结论才可靠。`, 'warn-li'));
   }
+  if (estimated.length) {
+    const m = state.midMeta || {};
+    const src = m.source === 'manual' ? '你手动填的中间价' : m.source === 'example' ? '示例中间价' : `${esc(m.source)}（${esc(m.date)}）`;
+    const per01 = estimated[0].r.finalAud * 0.001;
+    insights.push(li('⚠', `${estimated.map(x => esc(x.ch.tag)).join('、')} 有一步汇率按中间价估算，用的是${src}，不一定是实时价。中间价每差 0.1%，到账就差约 ${fmt(per01)} AUD，足以改变排名。建议点开渠道，取消「按中间价」并照抄实时报价。`, 'warn-li'));
+  }
   if (midExample) insights.push(li('⚠', '市场中间价还是示例值，成本率仅供演示。', 'warn-li'));
-  const unsure = shaky.includes(best) || midExample;
+  const unsure = best.st.level !== 'ok' || midExample;
 
   // 金额影响
   const segs = findSwitches().filter(s => s.ci >= 0);
@@ -912,6 +935,7 @@ function renderRows(results, ranked) {
     const flags = [];
     if (av.soft) flags.push(`<span class="flag grey">${esc(av.reason)}</span>`);
     if (ch.enabled && st.level !== 'ok') flags.push(`<span class="flag">${esc(st.text)}</span>`);
+    if (ch.enabled && st.estimate && st.level !== 'estimate') flags.push(`<span class="flag">按中间价估算</span>`);
     $('flags-' + ci).innerHTML = flags.join(' ');
 
     // 成本条：共用 0 基线，长度 = 成本率 / 当前最大成本率
@@ -947,6 +971,7 @@ function renderRows(results, ranked) {
       const used = s.auto ? m : num(s.rate);
       const dev = m && used ? (s.quote === 'perTo' ? used / m - 1 : 1 - used / m) : 0;
       const parts = [`中间价 ${unit === 'A100' ? fmt(m * 100, 2) : rateToDisplay(m, unit)}`];
+      if (s.auto) parts.push('⚠ 参考价估算，不是实时价，建议照抄实时报价');
       if (!s.auto && used) {
         parts.push(`<span class="${dev > 0.00005 ? 'bad' : ''}">比中间价差 ${pct(dev, 3)}</span>`);
         // 填错单位的典型情况：数字差了约 100 倍，或方向反了
@@ -1172,6 +1197,18 @@ document.querySelector('.theme').addEventListener('click', e => {
   if (b) applyTheme(b.dataset.themeSet);
 });
 applyTheme((() => { try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; } })());
+
+// 一次性迁移：旧版本 Wise 汇率默认「按中间价」，改为手动照抄（只改从没动过的默认设置）
+if (!(state.migrations && state.migrations.wiseManual)) {
+  const ch = state.channels.find(c => c.id === 'cbps-wise');
+  const s = ch && ch.steps.find(x => x.type === 'convert' && x.to === 'AUD');
+  if (s && s.auto && !s.updatedAt) {
+    s.auto = false;
+    s.rate = roundTo(midRate('HKD', 'AUD', s.quote, state.mid) || 0.181624, 6);
+    s.hint = '打开 Wise 换汇页面，照抄实时汇率（如 1 HKD = 0.18 AUD）';
+  }
+  state.migrations = Object.assign({}, state.migrations, { wiseManual: true });
+}
 
 // 启动
 refreshAll();
